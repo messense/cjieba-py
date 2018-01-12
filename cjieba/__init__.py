@@ -54,11 +54,11 @@ class Jieba(object):
         if ptr == ffi.NULL:
             return words
         index = 0
-        c_word = ptr[index]
-        while c_word != ffi.NULL:
-            words.append(ffi.string(c_word).decode('utf-8', 'replace'))
+        c_word = ffi.addressof(ptr, index)
+        while c_word.word != ffi.NULL:
+            words.append(ffi.string(c_word.word, c_word.len).decode('utf-8', 'replace'))
             index += 1
-            c_word = ptr[index]
+            c_word = ffi.addressof(ptr, index)
         return words
 
     def cut(self, text, cut_all=False, HMM=True):

@@ -9,36 +9,24 @@ Jieba NewJieba(const char* dict_path, const char* hmm_path, const char* user_dic
 void FreeJieba(Jieba);
 
 typedef struct {
-  const char* word;
+  char* word;
   size_t len;
 } CJiebaWord;
 
-void FreeWords(char** words);
+void FreeWords(CJiebaWord* words);
 
-char** Cut(Jieba handle, const char* sentence, int is_hmm_used);
-char** CutAll(Jieba handle, const char* sentence);
-char** CutForSearch(Jieba handle, const char* sentence, int is_hmm_used);
-char** Tag(Jieba handle, const char* sentence);
+CJiebaWord* Cut(Jieba handle, const char* sentence, int is_hmm_used);
+CJiebaWord* CutAll(Jieba handle, const char* sentence);
+CJiebaWord* CutForSearch(Jieba handle, const char* sentence, int is_hmm_used);
+CJiebaWord* Tag(Jieba handle, const char* sentence);
 void AddWord(Jieba handle, const char* word);
-
-typedef struct {
-  size_t offset;
-  size_t len;
-} Word;
-
-typedef enum {
-  DefaultMode = 0,
-  SearchMode = 1,
-} TokenizeMode;
-
-Word* Tokenize(Jieba x, const char* sentence, TokenizeMode mode, int is_hmm_used);
 
 struct CWordWeight {
   char* word;
   double weight;
 };
 
-char** Extract(Jieba handle, const char* sentence, int top_k);
+CJiebaWord* Extract(Jieba handle, const char* sentence, int top_k);
 struct CWordWeight* ExtractWithWeight(Jieba handle, const char* sentence, int top_k);
 void FreeWordWeights(struct CWordWeight* wws);
 

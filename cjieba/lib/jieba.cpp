@@ -7,25 +7,16 @@ extern "C" {
 
 using namespace std;
 
-static char** ConvertWords(const std::vector<std::string>& words) {
-  char ** res = (char**)malloc(sizeof(char*) * (words.size() + 1));
-  for (size_t i = 0; i < words.size(); i++) {
-    res[i] = (char*)malloc(sizeof(char) * (words[i].length() + 1));
-    strcpy(res[i], words[i].c_str());
-  }
-  res[words.size()] = NULL;
-  return res;
-}
-
-static Word* ConvertWords(const std::vector<cppjieba::Word>& words) {
-  Word* res = (Word*)malloc(sizeof(Word) * (words.size() + 1));
-  for (size_t i = 0; i < words.size(); i++) {
-    res[i].offset = words[i].offset;
-    res[i].len = words[i].word.size();
-  }
-  res[words.size()].offset = 0;
-  res[words.size()].len = 0;
-  return res;
+static CJiebaWord* ConvertWords(const std::vector<string>& words) {
+    CJiebaWord* res = (CJiebaWord*)malloc(sizeof(CJiebaWord) * (words.size() + 1));
+    for (size_t i = 0; i < words.size(); i++) {
+        res[i].word = (char*)malloc(sizeof(char) * words[i].size() + 1);
+        strcpy(res[i].word, words[i].c_str());
+        res[i].len = words[i].size();
+    }
+    res[words.size()].word = NULL;
+    res[words.size()].len = 0;
+    return res;
 }
 
 static struct CWordWeight* ConvertWords(const std::vector<std::pair<std::string, double> >& words) {
@@ -51,32 +42,35 @@ void FreeJieba(Jieba handle) {
   delete x;
 }
 
-void FreeWords(char** words) {
-  delete words;
+void FreeWords(CJiebaWord* words) {
+  CJiebaWord* x = words;
+  while (x && x->word) {
+    free(x->word);
+    x->word = NULL;
+    x++;
+  }
+  free(words);
 }
 
-char** Cut(Jieba x, const char* sentence, int is_hmm_used) {
+CJiebaWord* Cut(Jieba x, const char* sentence, int is_hmm_used) {
   std::vector<std::string> words;
   ((cppjieba::Jieba*)x)->Cut(sentence, words, is_hmm_used);
-  char** res = ConvertWords(words);
-  return res;
+  return ConvertWords(words);
 }
 
-char** CutAll(Jieba x, const char* sentence) {
+CJiebaWord* CutAll(Jieba x, const char* sentence) {
   std::vector<std::string> words;
   ((cppjieba::Jieba*)x)->CutAll(sentence, words);
-  char** res = ConvertWords(words);
-  return res;
+  return ConvertWords(words);
 }
 
-char** CutForSearch(Jieba x, const char* sentence, int is_hmm_used) {
+CJiebaWord* CutForSearch(Jieba x, const char* sentence, int is_hmm_used) {
   std::vector<std::string> words;
   ((cppjieba::Jieba*)x)->CutForSearch(sentence, words, is_hmm_used);
-  char** res = ConvertWords(words);
-  return res;
+  return ConvertWords(words);
 }
 
-char** Tag(Jieba x, const char* sentence) {
+CJiebaWord* Tag(Jieba x, const char* sentence) {
   std::vector<std::pair<std::string, std::string> > result;
   ((cppjieba::Jieba*)x)->Tag(sentence, result);
   std::vector<std::string> words;
@@ -91,18 +85,6 @@ void AddWord(Jieba x, const char* word) {
   ((cppjieba::Jieba*)x)->InsertUserWord(word);
 }
 
-Word* Tokenize(Jieba x, const char* sentence, TokenizeMode mode, int is_hmm_used) {
-  std::vector<cppjieba::Word> words;
-  switch (mode) {
-    case SearchMode:
-      ((cppjieba::Jieba*)x)->CutForSearch(sentence, words, is_hmm_used);
-      return ConvertWords(words);
-    default:
-      ((cppjieba::Jieba*)x)->Cut(sentence, words, is_hmm_used);
-      return ConvertWords(words);
-  }
-}
-
 struct CWordWeight* ExtractWithWeight(Jieba handle, const char* sentence, int top_k) {
   std::vector<std::pair<std::string, double> > words;
   ((cppjieba::Jieba*)handle)->extractor.Extract(sentence, words, top_k);
@@ -110,11 +92,10 @@ struct CWordWeight* ExtractWithWeight(Jieba handle, const char* sentence, int to
   return res;
 }
 
-char** Extract(Jieba handle, const char* sentence, int top_k) {
+CJiebaWord* Extract(Jieba handle, const char* sentence, int top_k) {
   std::vector<std::string> words;
   ((cppjieba::Jieba*)handle)->extractor.Extract(sentence, words, top_k);
-  char** res = ConvertWords(words);
-  return res;
+  return ConvertWords(words);
 }
 
 void FreeWordWeights(struct CWordWeight* wws) {
