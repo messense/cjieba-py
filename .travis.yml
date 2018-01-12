@@ -24,6 +24,7 @@ before_script:
   - export PATH=$HOME/virtualenv/bin:$PATH
 
 script:
+  - python setup.py develop
   - |
     if [[ "${TRAVIS_TAG:-}" != "" && "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then
       python setup.py sdist
