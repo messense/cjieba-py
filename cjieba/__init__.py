@@ -5,6 +5,8 @@ from os import path
 
 from ._native import ffi, lib
 
+__version__ = '0.1.0'
+
 CURR_PATH = path.abspath(path.dirname(__file__))
 PY2 = sys.version_info[0] == 2
 if PY2:
