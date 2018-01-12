@@ -10,8 +10,8 @@ using namespace std;
 static CJiebaWord* ConvertWords(const std::vector<string>& words) {
     CJiebaWord* res = (CJiebaWord*)malloc(sizeof(CJiebaWord) * (words.size() + 1));
     for (size_t i = 0; i < words.size(); i++) {
-        res[i].word = (char*)malloc(sizeof(char) * words[i].size() + 1);
-        strcpy(res[i].word, words[i].c_str());
+        res[i].word = (char *) malloc(words[i].size());
+        strncpy(res[i].word, words[i].data(), words[i].size());
         res[i].len = words[i].size();
     }
     res[words.size()].word = NULL;
