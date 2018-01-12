@@ -62,12 +62,12 @@ class Jieba(object):
         return words
 
     def cut(self, text, cut_all=False, HMM=True):
-        self.initialize()
         if cut_all:
             return self.cut_all(text)
-
         if not text:
             return []
+        self.initialize()
+
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         is_hmm = 1 if HMM else 0
@@ -77,9 +77,10 @@ class Jieba(object):
         return words
 
     def cut_all(self, text):
-        self.initialize()
         if not text:
             return []
+        self.initialize()
+
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         ret = lib.CutAll(self._jieba, sentence)
@@ -88,9 +89,10 @@ class Jieba(object):
         return words
 
     def cut_for_search(self, text, HMM=True):
-        self.initialize()
         if not text:
             return []
+        self.initialize()
+
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         is_hmm = 1 if HMM else 0
@@ -100,9 +102,10 @@ class Jieba(object):
         return words
 
     def tag(self, text):
-        self.initialize()
         if not text:
             return []
+        self.initialize()
+
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         ret = lib.Tag(self._jieba, sentence)
