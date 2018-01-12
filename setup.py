@@ -12,7 +12,7 @@ def build_native(spec):
     else:
         lib = 'lib%s.so' % name
     build = spec.add_external_build(
-        cmd=['g++', '-shared', '-I./cjieba/deps/', '-fPIC', '-O3', '-o', lib, 'cjieba/lib/jieba.cpp'],
+        cmd=['c++', '-shared', '-I./cjieba/deps/', '-fPIC', '-O3', '-o', lib, 'cjieba/lib/jieba.cpp'],
         path='.'
     )
 
