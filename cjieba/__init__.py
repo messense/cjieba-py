@@ -132,12 +132,19 @@ class Jieba(object):
         ret = lib.Tokenize(self._jieba, sentence, c_mode, is_hmm)
         ret = ffi.gc(ret, lib.FreeToken)
 
+        char_indices = {}
+        bytes_offset = 0
+        for char_index, char in enumerate(text):
+            length = len(char.encode('utf-8'))
+            char_indices[bytes_offset] = char_index
+            bytes_offset += length
+
         tokens = []
         index = 0
         c_token = ffi.addressof(ret, index)
         while c_token and c_token.len > 0:
             word = text_bytes[c_token.offset:c_token.offset + c_token.len].decode('utf-8')
-            start = len(text_bytes[:c_token.offset].decode('utf-8'))
+            start = char_indices[c_token.offset]
             end = start + len(word)
             tokens.append((word, start, end))
             index += 1
