@@ -49,3 +49,8 @@ def test_tokenize():
     assert ret[3] == ('长江', 3, 5)
     assert ret[4] == ('大桥', 5, 7)
     assert ret[5] == ('长江大桥', 3, 7)
+
+
+def test_free_jieba():
+    lib = cjieba.Jieba()
+    del lib
