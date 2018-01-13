@@ -7,15 +7,14 @@ extern "C" {
 
 using namespace std;
 
-static CJiebaWord* ConvertWords(const std::vector<string>& words) {
-    CJiebaWord* res = (CJiebaWord*)malloc(sizeof(CJiebaWord) * (words.size() + 1));
-    for (size_t i = 0; i < words.size(); i++) {
-        res[i].word = (char *) malloc(words[i].size());
-        strncpy(res[i].word, words[i].data(), words[i].size());
-        res[i].len = words[i].size();
+static CJiebaWords* ConvertWords(const std::vector<string>& words) {
+    size_t len = words.size();
+    CJiebaWords* res = static_cast<CJiebaWords*>(malloc(sizeof(CJiebaWords) * len));
+    res->len = len;
+    res->words = static_cast<char**>(malloc(sizeof(char*) * len));
+    for (size_t i = 0; i < len; i++) {
+        res->words[i] = strdup(words[i].c_str());
     }
-    res[words.size()].word = NULL;
-    res[words.size()].len = 0;
     return res;
 }
 
@@ -42,35 +41,35 @@ void FreeJieba(Jieba handle) {
   delete x;
 }
 
-void FreeWords(CJiebaWord* words) {
-  CJiebaWord* x = words;
-  while (x && x->word) {
-    free(x->word);
-    x->word = NULL;
-    x++;
-  }
-  free(words);
+void FreeWords(CJiebaWords* words) {
+    for (size_t i = 0; i < words->len ; i++) {
+        if (words->words[i] != NULL) {
+            free(words->words[i]);
+        }
+    }
+    free(words->words);
+    free(words);
 }
 
-CJiebaWord* Cut(Jieba x, const char* sentence, int is_hmm_used) {
+CJiebaWords* Cut(Jieba x, const char* sentence, int is_hmm_used) {
   std::vector<std::string> words;
   ((cppjieba::Jieba*)x)->Cut(sentence, words, is_hmm_used);
   return ConvertWords(words);
 }
 
-CJiebaWord* CutAll(Jieba x, const char* sentence) {
+CJiebaWords* CutAll(Jieba x, const char* sentence) {
   std::vector<std::string> words;
   ((cppjieba::Jieba*)x)->CutAll(sentence, words);
   return ConvertWords(words);
 }
 
-CJiebaWord* CutForSearch(Jieba x, const char* sentence, int is_hmm_used) {
+CJiebaWords* CutForSearch(Jieba x, const char* sentence, int is_hmm_used) {
   std::vector<std::string> words;
   ((cppjieba::Jieba*)x)->CutForSearch(sentence, words, is_hmm_used);
   return ConvertWords(words);
 }
 
-CJiebaWord* Tag(Jieba x, const char* sentence) {
+CJiebaWords* Tag(Jieba x, const char* sentence) {
   std::vector<std::pair<std::string, std::string> > result;
   ((cppjieba::Jieba*)x)->Tag(sentence, result);
   std::vector<std::string> words;
@@ -92,7 +91,7 @@ struct CWordWeight* ExtractWithWeight(Jieba handle, const char* sentence, int to
   return res;
 }
 
-CJiebaWord* Extract(Jieba handle, const char* sentence, int top_k) {
+CJiebaWords* Extract(Jieba handle, const char* sentence, int top_k) {
   std::vector<std::string> words;
   ((cppjieba::Jieba*)handle)->extractor.Extract(sentence, words, top_k);
   return ConvertWords(words);

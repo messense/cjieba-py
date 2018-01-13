@@ -50,15 +50,10 @@ class Jieba(object):
         self.__initialized = True
 
     def __ptr_to_list(self, ptr):
-        words = []
         if ptr == ffi.NULL:
-            return words
-        index = 0
-        c_word = ffi.addressof(ptr, index)
-        while c_word.word != ffi.NULL:
-            words.append(ffi.string(c_word.word, c_word.len).decode('utf-8', 'replace'))
-            index += 1
-            c_word = ffi.addressof(ptr, index)
+            return []
+        c_words = ffi.unpack(ptr.words, ptr.len)
+        words = [ffi.string(s).decode('utf-8', 'replace') for s in c_words]
         return words
 
     def cut(self, text, cut_all=False, HMM=True):
