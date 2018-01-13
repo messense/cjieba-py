@@ -15,27 +15,45 @@ cjieba.initialize()
 
 
 def test_cut():
+    ret = cjieba.cut('')
+    assert ret == []
+
     ret = cjieba.cut('南京市长江大桥')
     assert ret == ['南京市', '长江大桥']
 
+    ret = cjieba.cut('南京市长江大桥', cut_all=True)
+    assert ret == ['南京', '南京市', '京市', '市长', '长江', '长江大桥', '大桥']
+
 
 def test_cut_all():
+    ret = cjieba.cut_all('')
+    assert ret == []
+
     ret = cjieba.cut_all('南京市长江大桥')
     assert ret == ['南京', '南京市', '京市', '市长', '长江', '长江大桥', '大桥']
 
 
 def test_cut_for_search():
+    ret = cjieba.cut_for_search('')
+    assert ret == []
+
     ret = cjieba.cut_for_search('南京市长江大桥')
     assert ret == ['南京', '京市', '南京市', '长江', '大桥', '长江大桥']
 
 
 def test_tag():
+    ret = cjieba.tag('')
+    assert ret == []
+
     ret = cjieba.tag('南京市长江大桥')
     assert len(ret) == 2
     assert ret[0] == ('南京市', 'ns')
     assert ret[1] == ('长江大桥', 'ns')
 
 def test_tokenize():
+    ret = cjieba.tokenize('')
+    assert ret == []
+
     ret = cjieba.tokenize('南京市长江大桥')
     assert len(ret) == 2
     assert ret[0] == ('南京市', 0, 3)
@@ -51,6 +69,11 @@ def test_tokenize():
     assert ret[5] == ('长江大桥', 3, 7)
 
 
+def test_add_word():
+    cjieba.add_word('WTF')
+
+
 def test_free_jieba():
     lib = cjieba.Jieba()
+    lib.initialize()
     del lib
