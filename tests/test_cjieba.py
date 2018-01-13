@@ -61,6 +61,11 @@ def test_tokenize():
     assert ret[0] == ('南京市', 0, 3)
     assert ret[1] == ('长江大桥', 3, 7)
 
+    ret = cjieba.tokenize('南京南京')
+    assert len(ret) == 2
+    assert ret[0] == ('南京', 0, 2)
+    assert ret[1] == ('南京', 2, 4)
+
     ret = cjieba.tokenize('南京市长江大桥', mode='search')
     assert len(ret) == 6
     assert ret[0] == ('南京', 0, 2)

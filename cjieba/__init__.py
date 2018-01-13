@@ -137,7 +137,7 @@ class Jieba(object):
         c_token = ffi.addressof(ret, index)
         while c_token and c_token.len > 0:
             word = text_bytes[c_token.offset:c_token.offset + c_token.len].decode('utf-8')
-            start = text.find(word)
+            start = len(text_bytes[:c_token.offset].decode('utf-8'))
             end = start + len(word)
             tokens.append((word, start, end))
             index += 1
