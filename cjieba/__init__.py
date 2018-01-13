@@ -113,6 +113,35 @@ class Jieba(object):
         word = ffi.from_buffer(to_bytes(word))
         lib.AddWord(self._jieba, word)
 
+    def tokenize(self, text, mode='default', HMM=True):
+        if mode == 'default':
+            c_mode = lib.DefaultMode
+        elif mode == 'search':
+            c_mode = lib.SearchMode
+        else:
+            raise ValueError('Invalid tokenize mode, only default and search are supported')
+        if not text:
+            return []
+        self.initialize()
+
+        text_bytes = to_bytes(text)
+        sentence = ffi.from_buffer(text_bytes)
+        is_hmm = 1 if HMM else 0
+        ret = lib.Tokenize(self._jieba, sentence, c_mode, is_hmm)
+        ret = ffi.gc(ret, lib.FreeToken)
+
+        tokens = []
+        index = 0
+        c_token = ffi.addressof(ret, index)
+        while c_token and c_token.len > 0:
+            word = text_bytes[c_token.offset:c_token.offset + c_token.len].decode('utf-8')
+            start = text.find(word)
+            end = start + len(word)
+            tokens.append((word, start, end))
+            index += 1
+            c_token = ffi.addressof(ret, index)
+        return tokens
+
     def __del__(self):
         if self._jieba is not None:
             lib.FreeJieba(self._jieba)
@@ -127,3 +156,4 @@ cut_for_search = dt.cut_for_search
 lcut_for_search = cut_for_search
 tag = dt.tag
 add_word = dt.add_word
+tokenize = dt.tokenize

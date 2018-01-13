@@ -13,13 +13,26 @@ typedef struct {
   size_t len;
 } CJiebaWords;
 
-void FreeWords(CJiebaWords* words);
+void FreeCJiebaWords(CJiebaWords* words);
 
 CJiebaWords* Cut(Jieba handle, const char* sentence, int is_hmm_used);
 CJiebaWords* CutAll(Jieba handle, const char* sentence);
 CJiebaWords* CutForSearch(Jieba handle, const char* sentence, int is_hmm_used);
 CJiebaWords* Tag(Jieba handle, const char* sentence);
 void AddWord(Jieba handle, const char* word);
+
+typedef struct {
+  size_t offset;
+  size_t len;
+} Token;
+
+typedef enum {
+  DefaultMode = 0,
+  SearchMode = 1,
+} TokenizeMode;
+
+Token* Tokenize(Jieba x, const char* sentence, TokenizeMode mode, int is_hmm_used);
+void FreeToken(Token* tokens);
 
 struct CWordWeight {
   char* word;

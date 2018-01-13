@@ -18,10 +18,22 @@ static CJiebaWords* ConvertWords(const std::vector<string>& words) {
     return res;
 }
 
+static Token* ConvertTokens(const std::vector<cppjieba::Word>& words) {
+    size_t len = words.size();
+    Token* res = static_cast<Token*>(malloc(sizeof(Token) * (len + 1)));
+    for (size_t i = 0; i < len; i++) {
+        res[i].offset = words[i].offset;
+        res[i].len = words[i].word.size();
+    }
+    res[words.size()].offset = 0;
+    res[words.size()].len = 0;
+    return res;
+}
+
 static struct CWordWeight* ConvertWords(const std::vector<std::pair<std::string, double> >& words) {
-  struct CWordWeight* res = (struct CWordWeight*)malloc(sizeof(struct CWordWeight) * (words.size() + 1));
+  struct CWordWeight* res = static_cast<struct CWordWeight*>(malloc(sizeof(struct CWordWeight) * (words.size() + 1)));
   for (size_t i = 0; i < words.size(); i++) {
-    res[i].word = (char*)malloc(sizeof(char) * (words[i].first.length() + 1));
+    res[i].word = static_cast<char*>(malloc(sizeof(char) * (words[i].first.length() + 1)));
     strcpy(res[i].word, words[i].first.c_str());
     res[i].weight = words[i].second;
   }
@@ -41,7 +53,7 @@ void FreeJieba(Jieba handle) {
   delete x;
 }
 
-void FreeWords(CJiebaWords* words) {
+void FreeCJiebaWords(CJiebaWords* words) {
     for (size_t i = 0; i < words->len ; i++) {
         if (words->words[i] != NULL) {
             free(words->words[i]);
@@ -49,6 +61,10 @@ void FreeWords(CJiebaWords* words) {
     }
     free(words->words);
     free(words);
+}
+
+void FreeToken(Token* tokens) {
+    free(tokens);
 }
 
 CJiebaWords* Cut(Jieba x, const char* sentence, int is_hmm_used) {
@@ -82,6 +98,18 @@ CJiebaWords* Tag(Jieba x, const char* sentence) {
 
 void AddWord(Jieba x, const char* word) {
   ((cppjieba::Jieba*)x)->InsertUserWord(word);
+}
+
+Token* Tokenize(Jieba x, const char* sentence, TokenizeMode mode, int is_hmm_used) {
+  std::vector<cppjieba::Word> words;
+  switch (mode) {
+    case SearchMode:
+      ((cppjieba::Jieba*)x)->CutForSearch(sentence, words, is_hmm_used);
+      return ConvertTokens(words);
+    default:
+      ((cppjieba::Jieba*)x)->Cut(sentence, words, is_hmm_used);
+      return ConvertTokens(words);
+  }
 }
 
 struct CWordWeight* ExtractWithWeight(Jieba handle, const char* sentence, int top_k) {
