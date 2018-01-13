@@ -3,6 +3,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os
 import sys
 
+import pytest
+
 CURR_DIR = os.path.abspath(os.path.dirname(__file__))
 PROJ_DIR = os.path.dirname(CURR_DIR)
 if PROJ_DIR not in sys.path:
@@ -67,6 +69,9 @@ def test_tokenize():
     assert ret[3] == ('长江', 3, 5)
     assert ret[4] == ('大桥', 5, 7)
     assert ret[5] == ('长江大桥', 3, 7)
+
+    with pytest.raises(ValueError):
+        cjieba.tokenize('南京市长江大桥', mode='foo')
 
 
 def test_add_word():

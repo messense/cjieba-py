@@ -50,8 +50,6 @@ class Jieba(object):
         self.__initialized = True
 
     def __ptr_to_list(self, ptr):
-        if ptr == ffi.NULL:
-            return []
         c_words = ffi.unpack(ptr.words, ptr.len)
         words = [ffi.string(s).decode('utf-8', 'replace') for s in c_words]
         return words
