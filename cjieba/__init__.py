@@ -121,7 +121,9 @@ dt = Jieba()
 
 initialize = dt.initialize
 cut = dt.cut
+lcut = cut
 cut_all = dt.cut_all
 cut_for_search = dt.cut_for_search
+lcut_for_search = cut_for_search
 tag = dt.tag
 add_word = dt.add_word
