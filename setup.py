@@ -31,7 +31,7 @@ setup(
     author_email='messense@icloud.com',
     url='https://github.com/messense/cjieba-py',
     description='Python cffi binding for cjieba',
-    packages=find_packages(),
+    packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
     package_data={
         'cjieba': ['dict/*.utf8'],
@@ -40,6 +40,7 @@ setup(
     platforms='any',
     setup_requires=['milksnake'],
     install_requires=['milksnake'],
+    test_requires=['pytest', 'pytest-cov'],
     milksnake_tasks=[
         build_native
     ]

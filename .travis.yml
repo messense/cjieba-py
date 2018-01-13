@@ -16,14 +16,16 @@ before_script:
   - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
       brew update;
       brew install python3 pkg-config libffi;
+      sudo easy_install virtualenv
+      virtualenv -p python3 ~/virtualenv
+      source ~/virtualenv/bin/activate
+      export PATH=$HOME/virtualenv/bin:$PATH
     fi
-  - sudo easy_install virtualenv
-  - virtualenv -p python3 ~/virtualenv
-  - source ~/virtualenv/bin/activate
-  - export PATH=$HOME/virtualenv/bin:$PATH
+  - pip install pytest pytest-cov
 
 script:
   - python setup.py develop
+  - pytest -v tests
   - |
     if [[ "${TRAVIS_TAG:-}" != "" && "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
       python setup.py sdist

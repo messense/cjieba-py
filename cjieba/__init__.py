@@ -67,7 +67,7 @@ class Jieba(object):
         sentence = ffi.from_buffer(text)
         is_hmm = 1 if HMM else 0
         ret = lib.Cut(self._jieba, sentence, is_hmm)
-        ret = ffi.gc(ret, lib.FreeWords)
+        ret = ffi.gc(ret, lib.FreeCJiebaWords)
         words = self.__ptr_to_list(ret)
         return words
 
@@ -79,7 +79,7 @@ class Jieba(object):
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         ret = lib.CutAll(self._jieba, sentence)
-        ret = ffi.gc(ret, lib.FreeWords)
+        ret = ffi.gc(ret, lib.FreeCJiebaWords)
         words = self.__ptr_to_list(ret)
         return words
 
@@ -92,7 +92,7 @@ class Jieba(object):
         sentence = ffi.from_buffer(text)
         is_hmm = 1 if HMM else 0
         ret = lib.CutForSearch(self._jieba, sentence, is_hmm)
-        ret = ffi.gc(ret, lib.FreeWords)
+        ret = ffi.gc(ret, lib.FreeCJiebaWords)
         words = self.__ptr_to_list(ret)
         return words
 
@@ -104,7 +104,7 @@ class Jieba(object):
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         ret = lib.Tag(self._jieba, sentence)
-        ret = ffi.gc(ret, lib.FreeWords)
+        ret = ffi.gc(ret, lib.FreeCJiebaWords)
         words = self.__ptr_to_list(ret)
         return words
 
