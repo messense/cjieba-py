@@ -25,7 +25,7 @@ before_script:
 
 script:
   - python setup.py develop
-  - pytest -v tests
+  - pytest -v tests --cov
 
 after_success:
   - pip install codecov
