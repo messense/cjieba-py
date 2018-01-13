@@ -26,6 +26,10 @@ before_script:
 script:
   - python setup.py develop
   - pytest -v tests
+
+after_success:
+  - pip install codecov
+  - codecov
   - |
     if [[ "${TRAVIS_TAG:-}" != "" && "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
       python setup.py sdist
