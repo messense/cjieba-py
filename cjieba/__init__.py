@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function
 import sys
 from os import path
+from collections import namedtuple
 
 from ._native import ffi, lib
 
@@ -11,18 +12,17 @@ CURR_PATH = path.abspath(path.dirname(__file__))
 PY2 = sys.version_info[0] == 2
 if PY2:
     text_type = unicode
-    int_types = (int, long)
-    string_types = (str, unicode)
 else:
     text_type = str
-    int_types = (int,)
-    string_types = (str,)
 
 
 def to_bytes(s):
     if isinstance(s, text_type):
         return s.encode('utf-8')
     return s
+
+
+Tag = namedtuple('Tag', ['word', 'flag'])
 
 
 class Jieba(object):
@@ -106,7 +106,11 @@ class Jieba(object):
         ret = lib.Tag(self._jieba, sentence)
         ret = ffi.gc(ret, lib.FreeCJiebaWords)
         words = self.__ptr_to_list(ret)
-        return words
+        tags = []
+        for item in words:
+            word, flag  = item.split('/', 1)
+            tags.append(Tag(word, flag))
+        return tags
 
     def add_word(self, word):
         self.initialize()

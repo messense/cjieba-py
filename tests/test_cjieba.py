@@ -29,6 +29,12 @@ def test_cut_for_search():
     assert ret == ['南京', '京市', '南京市', '长江', '大桥', '长江大桥']
 
 
+def test_tag():
+    ret = cjieba.tag('南京市长江大桥')
+    assert len(ret) == 2
+    assert ret[0] == ('南京市', 'ns')
+    assert ret[1] == ('长江大桥', 'ns')
+
 def test_tokenize():
     ret = cjieba.tokenize('南京市长江大桥')
     assert len(ret) == 2
