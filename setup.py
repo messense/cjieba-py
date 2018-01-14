@@ -12,14 +12,26 @@ def build_native(spec):
     else:
         lib = 'lib%s.so' % name
     build = spec.add_external_build(
-        cmd=['c++', '-shared', '-I./cjieba/deps/', '-std=c++11', '-fPIC', '-O3', '-o', lib, 'cjieba/lib/jieba.cpp'],
-        path='.'
+        cmd=[
+            'c++',
+            '-shared',
+            '-std=c++11',
+            '-fPIC',
+            '-O3',
+            '-I./cppjieba/deps/',
+            '-I./cppjieba/include/',
+            '-I./include/',
+            '-o',
+            lib,
+            'lib/jieba.cc'
+        ],
+        path='./cjieba/cabi/'
     )
 
     spec.add_cffi_module(
         module_path='cjieba._native',
         dylib=lambda: build.find_dylib('jieba', in_path='.'),
-        header_filename=lambda: build.find_header('jieba.h', in_path='cjieba/lib/'),
+        header_filename=lambda: build.find_header('jieba.h', in_path='include/'),
         rtld_flags=['NOW', 'NODELETE']
     )
 

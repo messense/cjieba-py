@@ -79,8 +79,8 @@ def test_tokenize():
         cjieba.tokenize('南京市长江大桥', mode='foo')
 
 
-def test_add_word():
-    cjieba.add_word('WTF')
+def test_add_user_word():
+    cjieba.add_user_word('WTF')
 
 
 def test_free_jieba():

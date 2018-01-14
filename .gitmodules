@@ -1,0 +1,3 @@
+[submodule "cjieba/cabi"]
+	path = cjieba/cabi
+	url = https://github.com/messense/cppjieba-cabi.git

@@ -40,7 +40,7 @@ class Jieba(object):
         user_dict_path = ffi.new('char []', to_bytes(path.join(dict_dir, 'user.dict.utf8')))
         idf_path = ffi.new('char []', to_bytes(path.join(dict_dir, 'idf.utf8')))
         stop_words_path = ffi.new('char []', to_bytes(path.join(dict_dir, 'stop_words.utf8')))
-        self._jieba = lib.NewJieba(
+        self._jieba = lib.jieba_new(
             dict_path,
             hmm_path,
             user_dict_path,
@@ -50,7 +50,7 @@ class Jieba(object):
         self.__initialized = True
 
     def __ptr_to_list(self, ptr):
-        c_words = ffi.unpack(ptr.words, ptr.len)
+        c_words = ffi.unpack(ptr.words, ptr.length)
         words = [ffi.string(s).decode('utf-8', 'replace') for s in c_words]
         return words
 
@@ -64,8 +64,8 @@ class Jieba(object):
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         is_hmm = 1 if HMM else 0
-        ret = lib.Cut(self._jieba, sentence, is_hmm)
-        ret = ffi.gc(ret, lib.FreeCJiebaWords)
+        ret = lib.jieba_cut(self._jieba, sentence, is_hmm)
+        ret = ffi.gc(ret, lib.jieba_words_free)
         words = self.__ptr_to_list(ret)
         return words
 
@@ -76,8 +76,8 @@ class Jieba(object):
 
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
-        ret = lib.CutAll(self._jieba, sentence)
-        ret = ffi.gc(ret, lib.FreeCJiebaWords)
+        ret = lib.jieba_cut_all(self._jieba, sentence)
+        ret = ffi.gc(ret, lib.jieba_words_free)
         words = self.__ptr_to_list(ret)
         return words
 
@@ -89,8 +89,8 @@ class Jieba(object):
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         is_hmm = 1 if HMM else 0
-        ret = lib.CutForSearch(self._jieba, sentence, is_hmm)
-        ret = ffi.gc(ret, lib.FreeCJiebaWords)
+        ret = lib.jieba_cut_for_search(self._jieba, sentence, is_hmm)
+        ret = ffi.gc(ret, lib.jieba_words_free)
         words = self.__ptr_to_list(ret)
         return words
 
@@ -101,8 +101,8 @@ class Jieba(object):
 
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
-        ret = lib.Tag(self._jieba, sentence)
-        ret = ffi.gc(ret, lib.FreeCJiebaWords)
+        ret = lib.jieba_tag(self._jieba, sentence)
+        ret = ffi.gc(ret, lib.jieba_words_free)
         words = self.__ptr_to_list(ret)
         tags = []
         for item in words:
@@ -110,16 +110,16 @@ class Jieba(object):
             tags.append(Tag(word, flag))
         return tags
 
-    def add_word(self, word):
+    def add_user_word(self, word):
         self.initialize()
         word = ffi.from_buffer(to_bytes(word))
-        lib.AddWord(self._jieba, word)
+        lib.jieba_add_user_word(self._jieba, word)
 
     def tokenize(self, text, mode='default', HMM=True):
         if mode == 'default':
-            c_mode = lib.DefaultMode
+            c_mode = lib.JIEBA_TOKENIZE_MODE_DEFAULT
         elif mode == 'search':
-            c_mode = lib.SearchMode
+            c_mode = lib.JIEBA_TOKENIZE_MODE_SEARCH
         else:
             raise ValueError('Invalid tokenize mode, only default and search are supported')
         if not text:
@@ -129,23 +129,16 @@ class Jieba(object):
         text_bytes = to_bytes(text)
         sentence = ffi.from_buffer(text_bytes)
         is_hmm = 1 if HMM else 0
-        ret = lib.Tokenize(self._jieba, sentence, c_mode, is_hmm)
-        ret = ffi.gc(ret, lib.FreeToken)
-
-        char_indices = {}
-        bytes_offset = 0
-        for char_index, char in enumerate(text):
-            length = len(char.encode('utf-8'))
-            char_indices[bytes_offset] = char_index
-            bytes_offset += length
+        ret = lib.jieba_tokenize(self._jieba, sentence, c_mode, is_hmm)
+        ret = ffi.gc(ret, lib.jieba_token_free)
 
         tokens = []
         index = 0
         c_token = ffi.addressof(ret, index)
-        while c_token and c_token.len > 0:
-            word = text_bytes[c_token.offset:c_token.offset + c_token.len].decode('utf-8')
-            start = char_indices[c_token.offset]
-            end = start + len(word)
+        while c_token and c_token.length > 0:
+            start = c_token.unicode_offset
+            end = start + c_token.unicode_length
+            word = text[start:end]
             tokens.append((word, start, end))
             index += 1
             c_token = ffi.addressof(ret, index)
@@ -153,7 +146,7 @@ class Jieba(object):
 
     def __del__(self):
         if self._jieba is not None:
-            lib.FreeJieba(self._jieba)
+            lib.jieba_free(self._jieba)
 
 dt = Jieba()
 
@@ -164,5 +157,5 @@ cut_all = dt.cut_all
 cut_for_search = dt.cut_for_search
 lcut_for_search = cut_for_search
 tag = dt.tag
-add_word = dt.add_word
+add_user_word = dt.add_user_word
 tokenize = dt.tokenize
