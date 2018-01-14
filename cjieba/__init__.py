@@ -134,6 +134,14 @@ class Jieba(object):
             tags.append(Tag(word, flag))
         return tags
 
+    def lookup_tag(self, word):
+        self.initialize()
+
+        word = ffi.from_buffer(to_bytes(word))
+        ret = lib.jieba_lookup_tag(self._jieba, word)
+        ret = ffi.gc(ret, lib.jieba_str_free)
+        return ffi.string(ret).decode('utf-8')
+
     def add_user_word(self, word):
         self.initialize()
         word = ffi.from_buffer(to_bytes(word))
@@ -183,5 +191,6 @@ cut_hmm = dt.cut_hmm
 cut_small = dt.cut_small
 lcut_for_search = cut_for_search
 tag = dt.tag
+lookup_tag = dt.lookup_tag
 add_user_word = dt.add_user_word
 tokenize = dt.tokenize

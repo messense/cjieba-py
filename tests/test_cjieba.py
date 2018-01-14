@@ -68,6 +68,12 @@ def test_tag():
     assert ret[0] == ('南京市', 'ns')
     assert ret[1] == ('长江大桥', 'ns')
 
+
+def test_lookup_tag():
+    flag = cjieba.lookup_tag('工作')
+    assert flag == 'vn'
+
+
 def test_tokenize():
     ret = cjieba.tokenize('')
     assert ret == []
