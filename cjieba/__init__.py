@@ -94,6 +94,30 @@ class Jieba(object):
         words = self.__ptr_to_list(ret)
         return words
 
+    def cut_hmm(self, text):
+        if not text:
+            return []
+        self.initialize()
+
+        text = to_bytes(text)
+        sentence = ffi.from_buffer(text)
+        ret = lib.jieba_cut_hmm(self._jieba, sentence)
+        ret = ffi.gc(ret, lib.jieba_words_free)
+        words = self.__ptr_to_list(ret)
+        return words
+
+    def cut_small(self, text, max_word_len):
+        if not text:
+            return []
+        self.initialize()
+
+        text = to_bytes(text)
+        sentence = ffi.from_buffer(text)
+        ret = lib.jieba_cut_small(self._jieba, sentence, int(max_word_len))
+        ret = ffi.gc(ret, lib.jieba_words_free)
+        words = self.__ptr_to_list(ret)
+        return words
+
     def tag(self, text):
         if not text:
             return []
@@ -155,6 +179,8 @@ cut = dt.cut
 lcut = cut
 cut_all = dt.cut_all
 cut_for_search = dt.cut_for_search
+cut_hmm = dt.cut_hmm
+cut_small = dt.cut_small
 lcut_for_search = cut_for_search
 tag = dt.tag
 add_user_word = dt.add_user_word

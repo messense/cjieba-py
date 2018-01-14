@@ -43,6 +43,22 @@ def test_cut_for_search():
     assert ret == ['南京', '京市', '南京市', '长江', '大桥', '长江大桥']
 
 
+def test_cut_hmm():
+    ret = cjieba.cut_hmm('')
+    assert ret == []
+
+    ret = cjieba.cut_hmm('南京长江大桥')
+    assert ret == ['南京长', '江大桥']
+
+
+def test_cut_small():
+    ret = cjieba.cut_small('', 2)
+    assert ret == []
+
+    ret = cjieba.cut_small('南京长江大桥', 2)
+    assert ret == ['南京', '长江', '大桥']
+
+
 def test_tag():
     ret = cjieba.tag('')
     assert ret == []
