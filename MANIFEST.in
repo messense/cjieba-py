@@ -1,7 +1,5 @@
 include README.md
+include cjieba/dict/*.utf8
 
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
-
-recursive-include cjieba/deps *
-recursive-include cjieba/lib *
