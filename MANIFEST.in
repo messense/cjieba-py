@@ -1,5 +1,8 @@
 include README.md
 include cjieba/dict/*.utf8
 
+recursive-include cjieba/cabi *
+recursive-exclude * .git
+
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
