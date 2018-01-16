@@ -101,6 +101,32 @@ def test_tokenize():
         cjieba.tokenize('南京市长江大桥', mode='foo')
 
 
+def test_extract():
+    ret = cjieba.extract('')
+    assert ret == []
+
+    ret = cjieba.extract('南京市长江大桥')
+    assert ret == ['长江大桥', '南京市']
+
+    ret = cjieba.extract('南京市长江大桥', top_k=1)
+    assert ret == ['长江大桥']
+
+
+def test_extract_with_weight():
+    ret = cjieba.extract('', with_weight=True)
+    assert ret == []
+
+    ret = cjieba.extract('南京市长江大桥', with_weight=True)
+    assert ret[0].word == '长江大桥'
+    assert ret[0].weight > 11
+    assert ret[1].word == '南京市'
+    assert ret[1].weight > 8
+
+    ret = cjieba.extract('南京市长江大桥', top_k=1, with_weight=True)
+    assert ret[0].word == '长江大桥'
+    assert ret[0].weight > 11
+
+
 def test_add_user_word():
     cjieba.add_user_word('WTF')
 

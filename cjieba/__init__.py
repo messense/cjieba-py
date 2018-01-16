@@ -23,6 +23,7 @@ def to_bytes(s):
 
 
 Tag = namedtuple('Tag', ['word', 'flag'])
+WordWeight = namedtuple('WordWeight', ['word', 'weight'])
 
 
 class Jieba(object):
@@ -176,6 +177,42 @@ class Jieba(object):
             c_token = ffi.addressof(ret, index)
         return tokens
 
+    def extract(self, text, top_k=20, with_weight=False):
+        if with_weight:
+            return self._extract_with_weight(text, top_k)
+        if not text:
+            return []
+        self.initialize()
+
+        text = to_bytes(text)
+        sentence = ffi.from_buffer(text)
+        ret = lib.jieba_extract(self._jieba, sentence, int(top_k))
+        ret = ffi.gc(ret, lib.jieba_words_free)
+        words = self.__ptr_to_list(ret)
+        return words
+
+    def _extract_with_weight(self, text, top_k=20):
+        if not text:
+            return []
+        self.initialize()
+
+        text = to_bytes(text)
+        sentence = ffi.from_buffer(text)
+        ret = lib.jieba_extract_with_weight(self._jieba, sentence, int(top_k))
+        ret = ffi.gc(ret, lib.jieba_word_weight_free)
+
+        words = []
+        index = 0
+        c_word = ffi.addressof(ret, index)
+        while c_word and c_word.word != ffi.NULL:
+            words.append(WordWeight(
+                ffi.string(c_word.word).decode('utf-8'),
+                c_word.weight
+            ))
+            index += 1
+            c_word = ffi.addressof(ret, index)
+        return words
+
     def __del__(self):
         if self._jieba is not None:
             lib.jieba_free(self._jieba)
@@ -194,3 +231,4 @@ tag = dt.tag
 lookup_tag = dt.lookup_tag
 add_user_word = dt.add_user_word
 tokenize = dt.tokenize
+extract = dt.extract
