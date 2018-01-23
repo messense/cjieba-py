@@ -140,7 +140,6 @@ class Jieba(object):
 
         word = ffi.from_buffer(to_bytes(word))
         ret = lib.jieba_lookup_tag(self._jieba, word)
-        ret = ffi.gc(ret, lib.jieba_str_free)
         return ffi.string(ret).decode('utf-8')
 
     def add_user_word(self, word):
