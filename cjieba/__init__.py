@@ -65,9 +65,13 @@ class Jieba(object):
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         is_hmm = 1 if HMM else 0
-        ret = lib.jieba_cut(self._jieba, sentence, is_hmm)
-        ret = ffi.gc(ret, lib.jieba_words_free)
-        words = self.__ptr_to_list(ret)
+        ret = None
+        try:
+            ret = lib.jieba_cut(self._jieba, sentence, is_hmm)
+            words = self.__ptr_to_list(ret)
+        finally:
+            if ret is not None:
+                lib.jieba_words_free(ret)
         return words
 
     def cut_all(self, text):
@@ -77,9 +81,13 @@ class Jieba(object):
 
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
-        ret = lib.jieba_cut_all(self._jieba, sentence)
-        ret = ffi.gc(ret, lib.jieba_words_free)
-        words = self.__ptr_to_list(ret)
+        ret = None
+        try:
+            ret = lib.jieba_cut_all(self._jieba, sentence)
+            words = self.__ptr_to_list(ret)
+        finally:
+            if ret is not None:
+                lib.jieba_words_free(ret)
         return words
 
     def cut_for_search(self, text, HMM=True):
@@ -90,9 +98,13 @@ class Jieba(object):
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
         is_hmm = 1 if HMM else 0
-        ret = lib.jieba_cut_for_search(self._jieba, sentence, is_hmm)
-        ret = ffi.gc(ret, lib.jieba_words_free)
-        words = self.__ptr_to_list(ret)
+        ret = None
+        try:
+            ret = lib.jieba_cut_for_search(self._jieba, sentence, is_hmm)
+            words = self.__ptr_to_list(ret)
+        finally:
+            if ret is not None:
+                lib.jieba_words_free(ret)
         return words
 
     def cut_hmm(self, text):
@@ -102,9 +114,13 @@ class Jieba(object):
 
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
-        ret = lib.jieba_cut_hmm(self._jieba, sentence)
-        ret = ffi.gc(ret, lib.jieba_words_free)
-        words = self.__ptr_to_list(ret)
+        ret = None
+        try:
+            ret = lib.jieba_cut_hmm(self._jieba, sentence)
+            words = self.__ptr_to_list(ret)
+        finally:
+            if ret is not None:
+                lib.jieba_words_free(ret)
         return words
 
     def cut_small(self, text, max_word_len):
@@ -114,9 +130,13 @@ class Jieba(object):
 
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
-        ret = lib.jieba_cut_small(self._jieba, sentence, int(max_word_len))
-        ret = ffi.gc(ret, lib.jieba_words_free)
-        words = self.__ptr_to_list(ret)
+        ret = None
+        try:
+            ret = lib.jieba_cut_small(self._jieba, sentence, int(max_word_len))
+            words = self.__ptr_to_list(ret)
+        finally:
+            if ret is not None:
+                lib.jieba_words_free(ret)
         return words
 
     def tag(self, text):
@@ -126,9 +146,13 @@ class Jieba(object):
 
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
-        ret = lib.jieba_tag(self._jieba, sentence)
-        ret = ffi.gc(ret, lib.jieba_words_free)
-        words = self.__ptr_to_list(ret)
+        ret = None
+        try:
+            ret = lib.jieba_tag(self._jieba, sentence)
+            words = self.__ptr_to_list(ret)
+        finally:
+            if ret is not None:
+                lib.jieba_words_free(ret)
         tags = []
         for item in words:
             word, flag  = item.split('/', 1)
@@ -139,9 +163,13 @@ class Jieba(object):
         self.initialize()
 
         word = ffi.from_buffer(to_bytes(word))
-        ret = lib.jieba_lookup_tag(self._jieba, word)
-        ret = ffi.gc(ret, lib.jieba_str_free)
-        return ffi.string(ret).decode('utf-8')
+        ret = None
+        try:
+            ret = lib.jieba_lookup_tag(self._jieba, word)
+            return ffi.string(ret).decode('utf-8')
+        finally:
+            if ret is not None:
+                lib.jieba_str_free(ret)
 
     def add_user_word(self, word):
         self.initialize()
@@ -162,19 +190,22 @@ class Jieba(object):
         text_bytes = to_bytes(text)
         sentence = ffi.from_buffer(text_bytes)
         is_hmm = 1 if HMM else 0
-        ret = lib.jieba_tokenize(self._jieba, sentence, c_mode, is_hmm)
-        ret = ffi.gc(ret, lib.jieba_token_free)
-
         tokens = []
-        index = 0
-        c_token = ffi.addressof(ret, index)
-        while c_token and c_token.length > 0:
-            start = c_token.unicode_offset
-            end = start + c_token.unicode_length
-            word = text[start:end]
-            tokens.append((word, start, end))
-            index += 1
+        ret = None
+        try:
+            ret = lib.jieba_tokenize(self._jieba, sentence, c_mode, is_hmm)
+            index = 0
             c_token = ffi.addressof(ret, index)
+            while c_token and c_token.length > 0:
+                start = c_token.unicode_offset
+                end = start + c_token.unicode_length
+                word = text[start:end]
+                tokens.append((word, start, end))
+                index += 1
+                c_token = ffi.addressof(ret, index)
+        finally:
+            if ret is not None:
+                lib.jieba_token_free(ret)
         return tokens
 
     def extract(self, text, top_k=20, with_weight=False):
@@ -186,9 +217,13 @@ class Jieba(object):
 
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
-        ret = lib.jieba_extract(self._jieba, sentence, int(top_k))
-        ret = ffi.gc(ret, lib.jieba_words_free)
-        words = self.__ptr_to_list(ret)
+        ret = None
+        try:
+            ret = lib.jieba_extract(self._jieba, sentence, int(top_k))
+            words = self.__ptr_to_list(ret)
+        finally:
+            if ret is not None:
+                lib.jieba_words_free(ret)
         return words
 
     def _extract_with_weight(self, text, top_k=20):
@@ -198,19 +233,22 @@ class Jieba(object):
 
         text = to_bytes(text)
         sentence = ffi.from_buffer(text)
-        ret = lib.jieba_extract_with_weight(self._jieba, sentence, int(top_k))
-        ret = ffi.gc(ret, lib.jieba_word_weight_free)
-
         words = []
-        index = 0
-        c_word = ffi.addressof(ret, index)
-        while c_word and c_word.word != ffi.NULL:
-            words.append(WordWeight(
-                ffi.string(c_word.word).decode('utf-8'),
-                c_word.weight
-            ))
-            index += 1
+        ret = None
+        try:
+            ret = lib.jieba_extract_with_weight(self._jieba, sentence, int(top_k))
+            index = 0
             c_word = ffi.addressof(ret, index)
+            while c_word and c_word.word != ffi.NULL:
+                words.append(WordWeight(
+                    ffi.string(c_word.word).decode('utf-8'),
+                    c_word.weight
+                ))
+                index += 1
+                c_word = ffi.addressof(ret, index)
+        finally:
+            if ret is not None:
+                lib.jieba_word_weight_free(ret)
         return words
 
     def __del__(self):
