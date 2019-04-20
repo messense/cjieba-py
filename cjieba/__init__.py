@@ -41,12 +41,15 @@ class Jieba(object):
         user_dict_path = ffi.new('char []', to_bytes(path.join(dict_dir, 'user.dict.utf8')))
         idf_path = ffi.new('char []', to_bytes(path.join(dict_dir, 'idf.utf8')))
         stop_words_path = ffi.new('char []', to_bytes(path.join(dict_dir, 'stop_words.utf8')))
-        self._jieba = lib.jieba_new(
-            dict_path,
-            hmm_path,
-            user_dict_path,
-            idf_path,
-            stop_words_path
+        self._jieba = ffi.gc(
+            lib.jieba_new(
+                dict_path,
+                hmm_path,
+                user_dict_path,
+                idf_path,
+                stop_words_path
+            ),
+            lib.jieba_free
         )
         self.__initialized = True
 
@@ -251,9 +254,6 @@ class Jieba(object):
                 lib.jieba_word_weight_free(ret)
         return words
 
-    def __del__(self):
-        if self._jieba is not None:
-            lib.jieba_free(self._jieba)
 
 dt = Jieba()
 
