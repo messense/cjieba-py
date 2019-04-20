@@ -19,7 +19,7 @@ before_script:
       brew install pkg-config libffi;
       brew upgrade python;
       brew postinstall python;
-      sudo easy_install virtualenv;
+      sudo python3 -m pip install virtualenv;
       virtualenv -p python3 ~/virtualenv;
       source ~/virtualenv/bin/activate;
       export PATH=$HOME/virtualenv/bin:$PATH;
