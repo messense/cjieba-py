@@ -52,7 +52,7 @@ setup(
     platforms='any',
     setup_requires=['milksnake'],
     install_requires=['milksnake'],
-    tests_require=['pytest', 'pytest-cov'],
+    tests_require=['pytest>=3.6', 'pytest-cov'],
     milksnake_tasks=[
         build_native
     ]

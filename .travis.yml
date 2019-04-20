@@ -22,7 +22,7 @@ before_script:
       source ~/virtualenv/bin/activate;
       export PATH=$HOME/virtualenv/bin:$PATH;
     fi
-  - pip install pytest pytest-cov
+  - pip install -U pytest pytest-cov
 
 script:
   - python setup.py develop
