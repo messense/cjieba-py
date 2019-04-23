@@ -6,7 +6,7 @@ from collections import namedtuple
 
 from ._native import ffi, lib
 
-__version__ = '0.4.2'
+__version__ = '0.4.3'
 
 CURR_PATH = path.abspath(path.dirname(__file__))
 PY2 = sys.version_info[0] == 2

@@ -38,7 +38,7 @@ def build_native(spec):
 
 setup(
     name='cjieba',
-    version='0.4.2',
+    version='0.4.3',
     author='messense',
     author_email='messense@icloud.com',
     url='https://github.com/messense/cjieba-py',
