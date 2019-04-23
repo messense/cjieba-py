@@ -158,7 +158,7 @@ class Jieba(object):
                 lib.jieba_words_free(ret)
         tags = []
         for item in words:
-            word, flag  = item.split('/', 1)
+            word, flag  = item.rsplit('/', 1)
             tags.append(Tag(word, flag))
         return tags
 

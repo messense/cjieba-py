@@ -69,6 +69,14 @@ def test_tag():
     assert ret[1] == ('长江大桥', 'ns')
 
 
+def test_tag_with_slash():
+    ret = cjieba.tag('/ .')
+    assert len(ret) == 3
+    assert ret[0] == ('/', 'x')
+    assert ret[1] == (' ', 'x')
+    assert ret[2] == ('.', 'x')
+
+
 def test_lookup_tag():
     flag = cjieba.lookup_tag('工作')
     assert flag == 'vn'
