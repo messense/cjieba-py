@@ -15,10 +15,6 @@ matrix:
 
 before_script:
   - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
-      brew update;
-      brew install pkg-config libffi;
-      brew upgrade python;
-      brew postinstall python;
       sudo python3 -m pip install virtualenv;
       virtualenv -p python3 ~/virtualenv;
       source ~/virtualenv/bin/activate;
